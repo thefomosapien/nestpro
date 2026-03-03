@@ -14,6 +14,31 @@ const CDN = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist/';
 let _module = null;
 let _loading = null;
 
+/**
+ * Resolve the callable factory from whatever shape the CDN module exposes.
+ * Dynamic import() of a UMD script can produce different wrappers depending
+ * on the bundler and CDN — handle the common ones.
+ */
+function resolveFactory(mod) {
+  if (typeof mod === 'function') return mod;
+  if (typeof mod?.default === 'function') return mod.default;
+  if (typeof mod?.default?.default === 'function') return mod.default.default;
+  return null;
+}
+
+/**
+ * Fallback: inject a classic <script> tag so the UMD global is set.
+ */
+function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+    document.head.appendChild(s);
+  });
+}
+
 export async function loadOcct(onStatus) {
   if (_module) return _module;
   if (_loading) return _loading;
@@ -21,9 +46,26 @@ export async function loadOcct(onStatus) {
   _loading = (async () => {
     onStatus?.('Loading OpenCASCADE WASM (~5 MB)…');
 
-    // Dynamic import from CDN — @vite-ignore prevents Vite bundling it
-    const mod = await import(/* @vite-ignore */ CDN + 'occt-import-js.js');
-    const initFn = mod.default ?? mod;
+    // Try dynamic import first (works when the CDN serves a proper ESM wrapper)
+    let initFn = null;
+    try {
+      const mod = await import(/* @vite-ignore */ CDN + 'occt-import-js.js');
+      initFn = resolveFactory(mod);
+    } catch {
+      // Dynamic import failed — fall through to script-tag loader
+    }
+
+    // Fallback: load as a classic script so the UMD global is available
+    if (!initFn) {
+      await loadScript(CDN + 'occt-import-js.js');
+      initFn = resolveFactory(window.occtimportjs ?? window.occtImportJs);
+    }
+
+    if (!initFn) {
+      throw new Error(
+        'Failed to load occt-import-js: the module did not export a callable initialiser.',
+      );
+    }
 
     onStatus?.('Initialising WASM module…');
     const oc = await initFn({
