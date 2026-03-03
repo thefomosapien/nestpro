@@ -83,16 +83,29 @@ export function computeBBox(positions) {
 
 /**
  * Add a mesh + edge outline to scene.
+ * Options:
+ *   fusionStyle — opaque MeshStandardMaterial (Fusion 360 look) with subtle edges.
  * Returns cleanup fn.
  */
-export function addMeshWithEdges(scene, geo, color) {
-  const mat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(color),
-    roughness: 0.72,
-    metalness: 0.05,
-    clearcoat: 0.15,
-    clearcoatRoughness: 0.4,
-  });
+export function addMeshWithEdges(scene, geo, color, { fusionStyle = false } = {}) {
+  let mat;
+  if (fusionStyle) {
+    mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(color),
+      roughness: 0.55,
+      metalness: 0.1,
+      side: THREE.DoubleSide,
+    });
+  } else {
+    mat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(color),
+      roughness: 0.72,
+      metalness: 0.05,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.4,
+    });
+  }
+
   const mesh = new THREE.Mesh(geo, mat);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -102,7 +115,7 @@ export function addMeshWithEdges(scene, geo, color) {
   const edgesMat = new THREE.LineBasicMaterial({
     color: 0x000000,
     transparent: true,
-    opacity: 0.3,
+    opacity: fusionStyle ? 0.1 : 0.3,
   });
   const edges = new THREE.LineSegments(edgesGeo, edgesMat);
   scene.add(edges);

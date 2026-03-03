@@ -1,12 +1,11 @@
 /**
  * STEP / IGES parser using occt-import-js v0.0.23 (lazy-loaded from jsDelivr CDN).
  *
- * occt-import-js returns indexed meshes per body:
- *   mesh.index.position_count  — number of vertices
- *   mesh.index.index_count     — number of indices
- *   mesh.index.CopyPositionAttributes(Float32Array) — fills xyz per vertex
- *   mesh.index.CopyNormalAttributes(Float32Array)   — fills nxnynz per vertex
- *   mesh.index.CopyIndexAttributes(Uint32Array)     — fills triangle indices
+ * occt-import-js v0.0.23 returns pre-built typed arrays per mesh:
+ *   mesh.attributes.position.array  — Float32Array (xyz per vertex)
+ *   mesh.attributes.normal.array    — Float32Array (nxnynz per vertex)
+ *   mesh.index.array                — Uint32Array  (triangle indices)
+ *   mesh.color                      — { r, g, b } with 0-255 integers
  */
 
 const CDN = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist/';
@@ -106,16 +105,12 @@ export async function parseSTEP(buffer, isIGES = false, onStatus) {
 
   for (let mi = 0; mi < result.meshes.length; mi++) {
     const mesh = result.meshes[mi];
-    const idx = mesh.index;
-    if (!idx || idx.position_count === 0) continue;
 
-    const positions = new Float32Array(idx.position_count * 3);
-    const normals   = new Float32Array(idx.position_count * 3);
-    const indices   = new Uint32Array(idx.index_count);
+    const positions = mesh.attributes?.position?.array;
+    if (!positions || positions.length === 0) continue;
 
-    idx.CopyPositionAttributes(positions);
-    idx.CopyNormalAttributes(normals);
-    idx.CopyIndexAttributes(indices);
+    const normals = mesh.attributes?.normal?.array ?? null;
+    const indices = mesh.index?.array ?? null;
 
     // Compute bounding box (in mm)
     let minX = Infinity, maxX = -Infinity;
@@ -151,7 +146,7 @@ export async function parseSTEP(buffer, isIGES = false, onStatus) {
       h: dims[1],
       thickness: dims[2],
       bbox,
-      // flag so Viewport3D knows to scale positions (mm → display)
+      stepColor: mesh.color ?? null,
       positionUnit: 'mm',
     });
   }

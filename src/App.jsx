@@ -118,12 +118,11 @@ export default function App() {
 
   // ── 3D build-scene callbacks ─────────────────────────────────────────────────
 
-  /** Step 1 — show selected body */
+  /** Step 1 — show selected body (Fusion 360 style with STEP file colors) */
   const buildBodyScene = useCallback((scene) => {
     const body = bodies.find(b => b.id === selectedId);
     if (!body) return;
 
-    // Clone arrays for BufferGeometry (Three.js takes ownership)
     const geo = buildBufferGeometry(body.positions, body.normals, body.indices);
 
     // Centre geometry
@@ -132,7 +131,12 @@ export default function App() {
     geo.boundingBox.getCenter(centre);
     geo.translate(-centre.x, -centre.y, -centre.z);
 
-    return addMeshWithEdges(scene, geo, body.color);
+    // Use the original STEP color when available, otherwise neutral grey
+    const color = body.stepColor
+      ? new THREE.Color(body.stepColor.r / 255, body.stepColor.g / 255, body.stepColor.b / 255)
+      : new THREE.Color(0xB0B0B0);
+
+    return addMeshWithEdges(scene, geo, color, { fusionStyle: true });
   }, [bodies, selectedId]);
 
   /** Step 3 — 3D sheet+parts view */
