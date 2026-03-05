@@ -106,11 +106,16 @@ export async function parseSTEP(buffer, isIGES = false, onStatus) {
   for (let mi = 0; mi < result.meshes.length; mi++) {
     const mesh = result.meshes[mi];
 
-    const positions = mesh.attributes?.position?.array;
-    if (!positions || positions.length === 0) continue;
+    const rawPos = mesh.attributes?.position?.array;
+    if (!rawPos || rawPos.length === 0) continue;
 
-    const normals = mesh.attributes?.normal?.array ?? null;
-    const indices = mesh.index?.array ?? null;
+    // Copy typed arrays — the originals are views into WASM linear memory
+    // that become detached/zeroed once the module frees or reallocates.
+    const positions = new Float32Array(rawPos);
+    const rawNorm = mesh.attributes?.normal?.array;
+    const normals = rawNorm ? new Float32Array(rawNorm) : null;
+    const rawIdx = mesh.index?.array;
+    const indices = rawIdx ? new Uint32Array(rawIdx) : null;
 
     // Compute bounding box (in mm)
     let minX = Infinity, maxX = -Infinity;
