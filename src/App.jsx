@@ -184,7 +184,7 @@ export default function App() {
     // Floor plane below sheet
     const floorGeo = new THREE.PlaneGeometry(sheetW * 2, sheetH * 2);
     floorGeo.rotateX(-Math.PI / 2);
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 1 });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x181820, roughness: 1 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.position.set(sheetW / 2, -0.76, sheetH / 2);
     floor.receiveShadow = true;
@@ -431,13 +431,13 @@ export default function App() {
                 </div>
                 <div className="stat-row">
                   <span className="stat-label">Sheet size</span>
-                  <span className="stat-value" style={{ fontSize: 11 }}>
-                    {config.preset.w}"×{config.preset.h}"
+                  <span className="stat-value" style={{ fontSize: 13 }}>
+                    {config.preset.w}" × {config.preset.h}"
                   </span>
                 </div>
                 <div className="stat-row">
                   <span className="stat-label">Kerf + gap</span>
-                  <span className="stat-value" style={{ fontSize: 11 }}>
+                  <span className="stat-value" style={{ fontSize: 13 }}>
                     {(config.kerf + config.spacing).toFixed(4)}"
                   </span>
                 </div>

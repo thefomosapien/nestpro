@@ -29,14 +29,14 @@ export default function Viewport3D({ buildScene, style, label }) {
     renderer.setSize(mount.clientWidth || 600, mount.clientHeight || 400);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.setClearColor(0x0A0A0C);
+    renderer.setClearColor(0x1A1A22);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
     mount.appendChild(renderer.domElement);
 
     // ── Scene ────────────────────────────────────────────────
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0A0A0C, 0.008);
+    scene.fog = new THREE.FogExp2(0x1A1A22, 0.006);
 
     // ── Camera ───────────────────────────────────────────────
     const camera = new THREE.PerspectiveCamera(

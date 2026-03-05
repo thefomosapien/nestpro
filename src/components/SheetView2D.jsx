@@ -34,13 +34,13 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
   for (let x = 0; x <= sheetW; x += GRID_IN) {
     gridLines.push(
       <line key={`gx${x}`} x1={PAD + x} y1={PAD} x2={PAD + x} y2={PAD + sheetH}
-        stroke="#1E1E26" strokeWidth={x === 0 || x === sheetW ? 0.8 : 0.4} />
+        stroke="rgba(0,0,0,0.2)" strokeWidth={x === 0 || x === sheetW ? 0.8 : 0.4} />
     );
   }
   for (let y = 0; y <= sheetH; y += GRID_IN) {
     gridLines.push(
       <line key={`gy${y}`} x1={PAD} y1={PAD + y} x2={PAD + sheetW} y2={PAD + y}
-        stroke="#1E1E26" strokeWidth={y === 0 || y === sheetH ? 0.8 : 0.4} />
+        stroke="rgba(0,0,0,0.2)" strokeWidth={y === 0 || y === sheetH ? 0.8 : 0.4} />
     );
   }
 
@@ -50,12 +50,12 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
     const isMajor = x % 12 === 0;
     rulers.push(
       <line key={`rx${x}`} x1={PAD + x} y1={PAD - (isMajor ? 5 : 3)} x2={PAD + x} y2={PAD}
-        stroke="#444" strokeWidth={0.5} />
+        stroke="#999" strokeWidth={0.5} />
     );
     if (isMajor) {
       rulers.push(
         <text key={`rtx${x}`} x={PAD + x} y={PAD - 7} textAnchor="middle"
-          fontSize={3} fill="#555" fontFamily="monospace">{x}"</text>
+          fontSize={3} fill="#888" fontFamily="monospace">{x}"</text>
       );
     }
   }
@@ -63,12 +63,12 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
     const isMajor = y % 12 === 0;
     rulers.push(
       <line key={`ry${y}`} x1={PAD - (isMajor ? 5 : 3)} y1={PAD + y} x2={PAD} y2={PAD + y}
-        stroke="#444" strokeWidth={0.5} />
+        stroke="#999" strokeWidth={0.5} />
     );
     if (isMajor && y > 0) {
       rulers.push(
         <text key={`rty${y}`} x={PAD - 7} y={PAD + y + 1} textAnchor="middle"
-          fontSize={3} fill="#555" fontFamily="monospace"
+          fontSize={3} fill="#888" fontFamily="monospace"
           transform={`rotate(-90, ${PAD - 7}, ${PAD + y + 1})`}>{y}"</text>
       );
     }
@@ -93,8 +93,8 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
         <defs>
           {/* Plywood grain texture approximation */}
           <pattern id="grain" patternUnits="userSpaceOnUse" width="6" height="1">
-            <rect width="6" height="1" fill="#1A1208" />
-            <rect x="0" y="0" width="6" height="0.3" fill="#1E1508" opacity="0.5" />
+            <rect width="6" height="1" fill="#C8A06A" />
+            <rect x="0" y="0" width="6" height="0.3" fill="#B8905A" opacity="0.4" />
           </pattern>
         </defs>
 
@@ -103,14 +103,14 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
           x={PAD} y={PAD}
           width={sheetW} height={sheetH}
           fill="url(#grain)"
-          stroke="#3A3020"
+          stroke="#8B6914"
           strokeWidth={1}
         />
         <rect
           x={PAD} y={PAD}
           width={sheetW} height={sheetH}
-          fill="#2A1E0E"
-          opacity={0.55}
+          fill="#C09050"
+          opacity={0.3}
         />
 
         {/* Grid */}
@@ -134,9 +134,9 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
                 width={part.placedW}
                 height={part.placedH}
                 fill={part.color}
-                opacity={isHov ? 0.95 : 0.82}
-                stroke={isHov ? '#fff' : 'rgba(0,0,0,0.5)'}
-                strokeWidth={isHov ? 0.6 : 0.3}
+                opacity={isHov ? 1 : 0.9}
+                stroke={isHov ? '#fff' : 'rgba(0,0,0,0.6)'}
+                strokeWidth={isHov ? 0.8 : 0.4}
                 rx={0.3}
                 style={{ cursor: 'crosshair', transition: 'opacity 0.1s' }}
               />
@@ -148,7 +148,9 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fontSize={Math.min(4, part.placedW / 8, part.placedH / 2.5)}
-                  fill="rgba(255,255,255,0.85)"
+                  fill="#fff"
+                  stroke="rgba(0,0,0,0.5)"
+                  strokeWidth={0.15}
                   fontFamily="monospace"
                   fontWeight="600"
                   pointerEvents="none"
@@ -165,7 +167,7 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
           x={PAD} y={PAD}
           width={sheetW} height={sheetH}
           fill="none"
-          stroke="#5A4A30"
+          stroke="#8B6914"
           strokeWidth={0.8}
         />
 
@@ -181,7 +183,7 @@ export default function SheetView2D({ sheet, unit = 'in' }) {
         </text>
 
         {/* Dimensions label */}
-        <text x={PAD} y={PAD + sheetH + 8} fontSize={3.5} fill="#666"
+        <text x={PAD} y={PAD + sheetH + 8} fontSize={3.5} fill="#AAA"
           fontFamily="monospace">
           {fmt(sheetW)}{unit} × {fmt(sheetH)}{unit}
         </text>

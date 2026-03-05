@@ -60,24 +60,30 @@ export function optimizeSheets(parts, sheetW, sheetH, kerf, spacing, minUtil) {
     const otherIdxs = sheets.map((_, i) => i).filter(i => i !== lowIdx);
 
     // Try to fit the low-util parts onto every other sheet one by one
-    let redistributed = true;
     const remaining = [...lowParts];
 
     for (const si of otherIdxs) {
       if (remaining.length === 0) break;
 
+      const existingParts = sheets[si].placed;
       // Re-pack existing parts + the overflow candidates on that sheet
-      const combined = [...sheets[si].placed, ...remaining].sort(
+      const combined = [...existingParts, ...remaining].sort(
         (a, b) => b.w * b.h - a.w * a.h
       );
       const trial = guillotinePack(combined, sheetW, sheetH, kerf, spacing);
 
-      if (trial.placed.length === combined.length) {
+      // Reject if any original parts on this sheet got displaced
+      const allOriginalsKept = existingParts.every(
+        p => trial.placed.some(tp => tp.id === p.id)
+      );
+      if (!allOriginalsKept) continue;
+
+      if (trial.placed.length >= combined.length) {
         // All fit — update that sheet
         sheets = sheets.map((s, i) => (i === si ? trial : s));
         remaining.length = 0;
-      } else if (trial.placed.length > sheets[si].placed.length) {
-        // Partial improvement
+      } else if (trial.placed.length > existingParts.length) {
+        // Partial improvement — only low-util parts remain
         sheets = sheets.map((s, i) => (i === si ? trial : s));
         remaining.splice(
           0,
@@ -90,11 +96,8 @@ export function optimizeSheets(parts, sheetW, sheetH, kerf, spacing, minUtil) {
     if (remaining.length === 0) {
       // Successfully emptied the low-util sheet — remove it
       sheets = sheets.filter((_, i) => i !== lowIdx);
-    } else {
-      redistributed = false;
     }
-
-    if (!redistributed) break;
+    // Continue trying other low-util sheets even if this one couldn't be emptied
   }
 
   return { sheets, unplaced: best.unplaced };
