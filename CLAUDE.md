@@ -38,3 +38,12 @@ NestPro is a **CNC Plywood Nesting Optimizer** — a React + Vite single-page ap
 - **Styling**: Single `index.css` file with CSS custom properties (--bg, --accent, --text, etc.). Dark theme with accent orange (#E8654A).
 - **Vite config**: Custom CORS headers (COEP/COOP) for SharedArrayBuffer support required by WASM.
 - **Deployment**: Vercel (configured in vercel.json).
+
+## Critical: occt-import-js v0.0.23 API
+
+Mesh data is pre-built typed arrays. DO NOT use CopyPositionAttributes/CopyNormalAttributes/CopyIndexAttributes — they don't exist.
+
+- `mesh.attributes.position.array` → Float32Array
+- `mesh.attributes.normal.array` → Float32Array
+- `mesh.index.array` → Uint32Array
+- `mesh.color` → {r, g, b} (0-255)
