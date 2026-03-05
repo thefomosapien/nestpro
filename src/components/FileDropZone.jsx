@@ -43,7 +43,7 @@ export default function FileDropZone({ onBodiesLoaded }) {
         for (const body of bodies) {
           body.id      = `${file.name}::${all.length}`;
           body.isSheet = body.thickness <= DEFAULTS.thicknessThreshold;
-          body.checked = body.isSheet;
+          body.checked = true;
           body.color   = PART_PALETTE[colorIdx % PART_PALETTE.length];
           colorIdx++;
           all.push(body);

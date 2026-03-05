@@ -134,7 +134,7 @@ export function addMeshWithEdges(scene, geo, color, { fusionStyle = false } = {}
  * Create scene lighting (ambient 0.4, directional 0.8 + shadow, fill 0.3).
  */
 export function setupLighting(scene) {
-  const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
   scene.add(ambient);
 
   const dir = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -165,7 +165,7 @@ export function setupLighting(scene) {
  * Create a grid floor.
  */
 export function addGridFloor(scene) {
-  const grid = new THREE.GridHelper(400, 80, 0x1A1A22, 0x141418);
+  const grid = new THREE.GridHelper(400, 80, 0x2A2A34, 0x1E1E26);
   grid.position.y = -0.01;
   scene.add(grid);
   return () => {

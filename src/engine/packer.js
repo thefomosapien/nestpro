@@ -17,8 +17,8 @@
 export function guillotinePack(parts, sheetW, sheetH, kerf, spacing) {
   const gap = kerf + spacing;
 
-  // Sort by area descending for better packing density
-  const sorted = [...parts].sort((a, b) => b.w * b.h - a.w * a.h);
+  // Use the caller's sort order — the optimizer passes different strategies.
+  const sorted = [...parts];
 
   let freeRects = [{ x: 0, y: 0, w: sheetW, h: sheetH }];
   const placed  = [];
